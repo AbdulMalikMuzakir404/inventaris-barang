@@ -56,6 +56,8 @@ router.get('/:id', categoryController.getById);
  *           schema:
  *             type: object
  *             properties:
+ *               kode:
+ *                 type: string
  *               nama:
  *                 type: string
  *     responses:
@@ -83,6 +85,8 @@ router.post('/', categoryValidation, categoryController.create);
  *           schema:
  *             type: object
  *             properties:
+ *               kode:
+ *                 type: string
  *               nama:
  *                 type: string
  *     responses:

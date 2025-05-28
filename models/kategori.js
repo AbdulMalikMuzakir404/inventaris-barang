@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   Kategori.init(
     {
       nama: DataTypes.STRING,
+      kode: DataTypes.STRING,
     },
     {
       sequelize,

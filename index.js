@@ -26,7 +26,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: `${baseUrl}:${basePort}` || 'http://localhost:3000',
+        url: `${baseUrl}` || 'http://localhost:3000',
       },
     ],
   },

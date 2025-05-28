@@ -4,7 +4,7 @@ Deskripsi Aplikasi Inventaris Barang
 Inventaris Barang adalah aplikasi berbasis web yang digunakan untuk mencatat dan mengelola data barang yang dimiliki oleh sebuah organisasi, kantor, atau unit usaha. Aplikasi ini memungkinkan pengguna untuk menambahkan, mengedit, melihat, dan menghapus data barang, serta mengelompokkan barang berdasarkan kategori tertentu.
 
 Fitur Utama:
-1.Manajemen Barang
+1. Manajemen Barang
 Pengguna dapat menambah, melihat, mengubah, dan menghapus data barang.
 2. Kategori Barang
 Barang dapat dikelompokkan berdasarkan kategori seperti Elektronik, Alat Tulis, Furniture, dll.

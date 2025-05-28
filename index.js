@@ -7,9 +7,14 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
+require('dotenv').config();
+
 // === SWAGGER SETUP ===
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+
+const baseUrl = process.env.BASE_URL
+const basePort = process.env.PORT
 
 const swaggerOptions = {
   definition: {
@@ -21,7 +26,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: baseUrl || 'localhost',
       },
     ],
   },
@@ -40,7 +45,7 @@ const categoryRoutes = require('./routes/category');
 app.use('/api/category', categoryRoutes);
 
 // === START SERVER ===
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-  console.log(`Swagger dokumentasi: http://localhost:${PORT}/api-docs`);
+app.listen(basePort || 3000, () => {
+  console.log(`Server berjalan di http://${baseUrl || 'localhost'}:${basePort}`);
+  console.log(`Swagger dokumentasi: http://${baseUrl || 'localhost'}:${basePort}/api-docs`);
 });

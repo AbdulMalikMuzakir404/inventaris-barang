@@ -32,8 +32,12 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // === ROUTES ===
-const barangRoutes = require('./routes/barang');
-app.use('/api/barang', barangRoutes);
+/** Item */
+const itemRoutes = require('./routes/item');
+app.use('/api/item', itemRoutes);
+/** Category */
+const categoryRoutes = require('./routes/category');
+app.use('/api/category', categoryRoutes);
 
 // === START SERVER ===
 app.listen(PORT, () => {

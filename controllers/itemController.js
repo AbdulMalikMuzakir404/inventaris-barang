@@ -1,4 +1,5 @@
 const { Barang } = require('../models');
+const handleError = require('../utils/handleError');
 
 exports.getAll = async (_, res) => {
   try {
@@ -50,11 +51,7 @@ exports.create = async (req, res) => {
       data,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: 'Gagal menambahkan kategori',
-      error: error.message,
-    });
+    handleError(res, error, 'Gagal menambahkan kategori');
   }
 };
 

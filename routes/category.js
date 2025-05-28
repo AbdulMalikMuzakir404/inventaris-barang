@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const categoryController = require('../controllers/categoryController');
+const { categoryValidation } = require('../middlewares/categoryValidation');
 
 /**
  * @swagger
@@ -61,7 +62,7 @@ router.get('/:id', categoryController.getById);
  *       201:
  *         description: Kategori berhasil ditambahkan
  */
-router.post('/', categoryController.create);
+router.post('/', categoryValidation, categoryController.create);
 
 /**
  * @swagger
@@ -90,7 +91,7 @@ router.post('/', categoryController.create);
  *       404:
  *         description: Kategori tidak ditemukan
  */
-router.put('/:id', categoryController.update);
+router.put('/:id', categoryValidation, categoryController.update);
 
 /**
  * @swagger

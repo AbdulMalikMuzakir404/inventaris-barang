@@ -1,6 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const itemController = require('../controllers/itemController');
+const itemController = require("../controllers/itemController");
+const { itemValidation } = require("../middlewares/itemValidation");
 
 /**
  * @swagger
@@ -19,7 +20,7 @@ const itemController = require('../controllers/itemController');
  *       200:
  *         description: Daftar barang berhasil diambil
  */
-router.get('/', itemController.getAll);
+router.get("/", itemController.getAll);
 
 /**
  * @swagger
@@ -40,7 +41,7 @@ router.get('/', itemController.getAll);
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.get('/:id', itemController.getById);
+router.get("/:id", itemController.getById);
 
 /**
  * @swagger
@@ -65,7 +66,7 @@ router.get('/:id', itemController.getById);
  *       201:
  *         description: Barang berhasil ditambahkan
  */
-router.post('/', itemController.create);
+router.post("/", itemValidation, itemController.create);
 
 /**
  * @swagger
@@ -98,7 +99,7 @@ router.post('/', itemController.create);
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.put('/:id', itemController.update);
+router.put("/:id", itemValidation, itemController.update);
 
 /**
  * @swagger
@@ -118,6 +119,6 @@ router.put('/:id', itemController.update);
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.delete('/:id', itemController.remove);
+router.delete("/:id", itemController.remove);
 
 module.exports = router;

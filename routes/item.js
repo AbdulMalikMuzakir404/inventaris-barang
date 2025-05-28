@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const barangController = require('../controllers/barangController');
+const itemController = require('../controllers/itemController');
 
 /**
  * @swagger
@@ -11,7 +11,7 @@ const barangController = require('../controllers/barangController');
 
 /**
  * @swagger
- * /api/barang:
+ * /api/item:
  *   get:
  *     summary: Ambil semua data barang
  *     tags: [Barang]
@@ -19,11 +19,11 @@ const barangController = require('../controllers/barangController');
  *       200:
  *         description: Daftar barang berhasil diambil
  */
-router.get('/', barangController.getAll);
+router.get('/', itemController.getAll);
 
 /**
  * @swagger
- * /api/barang/{id}:
+ * /api/item/{id}:
  *   get:
  *     summary: Ambil data barang berdasarkan ID
  *     tags: [Barang]
@@ -40,11 +40,11 @@ router.get('/', barangController.getAll);
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.get('/:id', barangController.getById);
+router.get('/:id', itemController.getById);
 
 /**
  * @swagger
- * /api/barang:
+ * /api/item:
  *   post:
  *     summary: Tambah data barang
  *     tags: [Barang]
@@ -57,21 +57,19 @@ router.get('/:id', barangController.getById);
  *             properties:
  *               nama:
  *                 type: string
- *               kode:
- *                 type: string
- *               jumlah:
+ *               stok:
  *                 type: integer
- *               keterangan:
- *                 type: string
+ *               kategoriId:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Barang berhasil ditambahkan
  */
-router.post('/', barangController.create);
+router.post('/', itemController.create);
 
 /**
  * @swagger
- * /api/barang/{id}:
+ * /api/item/{id}:
  *   put:
  *     summary: Update data barang
  *     tags: [Barang]
@@ -90,23 +88,21 @@ router.post('/', barangController.create);
  *             properties:
  *               nama:
  *                 type: string
- *               kode:
- *                 type: string
- *               jumlah:
+ *               stok:
  *                 type: integer
- *               keterangan:
- *                 type: string
+ *               kategoriId:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Barang berhasil diupdate
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.put('/:id', barangController.update);
+router.put('/:id', itemController.update);
 
 /**
  * @swagger
- * /api/barang/{id}:
+ * /api/item/{id}:
  *   delete:
  *     summary: Hapus data barang
  *     tags: [Barang]
@@ -122,6 +118,6 @@ router.put('/:id', barangController.update);
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.delete('/:id', barangController.remove);
+router.delete('/:id', itemController.remove);
 
 module.exports = router;

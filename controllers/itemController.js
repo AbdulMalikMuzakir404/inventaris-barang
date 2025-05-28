@@ -1,4 +1,4 @@
-const { Barang } = require("../models");
+const { Barang, Kategori } = require("../models");
 const handleError = require("../utils/handleError");
 
 exports.getAll = async (_, res) => {
@@ -6,7 +6,7 @@ exports.getAll = async (_, res) => {
     const data = await Barang.findAll({
       include: {
         model: Kategori,
-        as: "kategori",
+        as: "kategori"
       },
     });
     res.json({

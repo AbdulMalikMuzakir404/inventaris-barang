@@ -26,7 +26,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: baseUrl,
+        url: 'https://inventaris.diwirain.my.id',
       },
     ],
   },

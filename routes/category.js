@@ -1,7 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const categoryController = require('../controllers/categoryController');
-const { categoryValidation } = require('../middlewares/categoryValidation');
+const categoryController = require("../controllers/categoryController");
+const { categoryValidation } = require("../validation/categoryValidation");
+const authMiddleware = require("../middlewares/authMiddleware");
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -16,11 +19,13 @@ const { categoryValidation } = require('../middlewares/categoryValidation');
  *   get:
  *     summary: Ambil semua data kategori
  *     tags: [Kategori]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Daftar kategori berhasil diambil
  */
-router.get('/', categoryController.getAll);
+router.get("/", categoryController.getAll);
 
 /**
  * @swagger
@@ -28,6 +33,8 @@ router.get('/', categoryController.getAll);
  *   get:
  *     summary: Ambil data kategori berdasarkan ID
  *     tags: [Kategori]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -41,7 +48,7 @@ router.get('/', categoryController.getAll);
  *       404:
  *         description: Kategori tidak ditemukan
  */
-router.get('/:id', categoryController.getById);
+router.get("/:id", categoryController.getById);
 
 /**
  * @swagger
@@ -49,6 +56,8 @@ router.get('/:id', categoryController.getById);
  *   post:
  *     summary: Tambah data kategori
  *     tags: [Kategori]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -64,7 +73,7 @@ router.get('/:id', categoryController.getById);
  *       201:
  *         description: Kategori berhasil ditambahkan
  */
-router.post('/', categoryValidation, categoryController.create);
+router.post("/", categoryValidation, categoryController.create);
 
 /**
  * @swagger
@@ -72,6 +81,8 @@ router.post('/', categoryValidation, categoryController.create);
  *   put:
  *     summary: Update data kategori
  *     tags: [Kategori]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -95,7 +106,7 @@ router.post('/', categoryValidation, categoryController.create);
  *       404:
  *         description: Kategori tidak ditemukan
  */
-router.put('/:id', categoryValidation, categoryController.update);
+router.put("/:id", categoryValidation, categoryController.update);
 
 /**
  * @swagger
@@ -103,6 +114,8 @@ router.put('/:id', categoryValidation, categoryController.update);
  *   delete:
  *     summary: Hapus data kategori
  *     tags: [Kategori]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -115,6 +128,6 @@ router.put('/:id', categoryValidation, categoryController.update);
  *       404:
  *         description: Kategori tidak ditemukan
  */
-router.delete('/:id', categoryController.remove);
+router.delete("/:id", categoryController.remove);
 
 module.exports = router;

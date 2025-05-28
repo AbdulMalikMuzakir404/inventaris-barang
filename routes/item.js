@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const itemController = require("../controllers/itemController");
-const { itemValidation } = require("../middlewares/itemValidation");
+const { itemValidation } = require("../validation/itemValidation");
+const authMiddleware = require('../middlewares/authMiddleware');
+
+router.use(authMiddleware);
 
 /**
  * @swagger
@@ -16,6 +19,8 @@ const { itemValidation } = require("../middlewares/itemValidation");
  *   get:
  *     summary: Ambil semua data barang
  *     tags: [Barang]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Daftar barang berhasil diambil
@@ -28,6 +33,8 @@ router.get("/", itemController.getAll);
  *   get:
  *     summary: Ambil data barang berdasarkan ID
  *     tags: [Barang]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -49,6 +56,8 @@ router.get("/:id", itemController.getById);
  *   post:
  *     summary: Tambah data barang
  *     tags: [Barang]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -74,6 +83,8 @@ router.post("/", itemValidation, itemController.create);
  *   put:
  *     summary: Update data barang
  *     tags: [Barang]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -107,6 +118,8 @@ router.put("/:id", itemValidation, itemController.update);
  *   delete:
  *     summary: Hapus data barang
  *     tags: [Barang]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

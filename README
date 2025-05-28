@@ -1,1 +1,24 @@
 INVESTARIS APPLICATION
+
+Deskripsi Aplikasi Inventaris Barang
+Inventaris Barang adalah aplikasi berbasis web yang digunakan untuk mencatat dan mengelola data barang yang dimiliki oleh sebuah organisasi, kantor, atau unit usaha. Aplikasi ini memungkinkan pengguna untuk menambahkan, mengedit, melihat, dan menghapus data barang, serta mengelompokkan barang berdasarkan kategori tertentu.
+
+Fitur Utama:
+1.Manajemen Barang
+Pengguna dapat menambah, melihat, mengubah, dan menghapus data barang.
+2. Kategori Barang
+Barang dapat dikelompokkan berdasarkan kategori seperti Elektronik, Alat Tulis, Furniture, dll.
+3. Stok Barang
+Setiap barang memiliki informasi jumlah/stok saat ini.
+4. Pencarian & Filter
+Pengguna dapat mencari barang berdasarkan nama atau kategori (fitur opsional).
+5. Tampilan Tabel Dinamis
+Menampilkan data barang dalam bentuk tabel interaktif menggunakan Vue.js.
+
+Teknologi yang digunakan:
+1. Vue 3 + Vite + Axios untuk Frontend
+2. NodeJs + ExpressJs untuk Backend
+3. MySQL untuk Database
+4. Sequelize untuk ORM
+5. RESTful API untuk API Pattern
+6. Swagger untuk API documentasi

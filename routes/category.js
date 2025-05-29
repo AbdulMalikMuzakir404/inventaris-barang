@@ -21,11 +21,70 @@ router.use(authMiddleware);
  *     tags: [Kategori]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         description: Kata kunci pencarian berdasarkan nama atau kode
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: Nomor halaman
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *         description: Jumlah data per halaman
  *     responses:
  *       200:
  *         description: Daftar kategori berhasil diambil
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Berhasil mengambil semua kategori
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Category'
+ *                 total:
+ *                   type: integer
+ *                   example: 25
+ *                 page:
+ *                   type: integer
+ *                   example: 1
+ *                 limit:
+ *                   type: integer
+ *                   example: 10
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 3
  */
 router.get("/", categoryController.getAll);
+
+/**
+ * @swagger
+ * /api/category/simple:
+ *   get:
+ *     summary: Ambil semua kategori tanpa pagination
+ *     tags: [Kategori]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Data kategori berhasil diambil
+ */
+router.get('/simple', categoryController.getAllSimple)
 
 /**
  * @swagger

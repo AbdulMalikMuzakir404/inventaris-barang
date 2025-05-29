@@ -1,18 +1,51 @@
 const { Barang, Kategori } = require("../models");
 const handleError = require("../utils/handleError");
+const { Op } = require("sequelize");
 
-exports.getAll = async (_, res) => {
+exports.getAll = async (req, res) => {
   try {
-    const data = await Barang.findAll({
-      include: {
-        model: Kategori,
-        as: "kategori"
-      },
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    const q = req.query.q?.trim();
+
+    const isSearch = !!q;
+    const isNumeric = !isNaN(q);
+
+    const whereCondition = isSearch
+      ? {
+          [Op.or]: [
+            { nama: { [Op.like]: `%${q}%` } },
+            ...(isNumeric ? [{ stok: parseInt(q) }] : []),
+          ],
+        }
+      : {};
+
+    const kategoriInclude = {
+      model: Kategori,
+      as: "kategori",
+      required: false,
+      ...(isSearch && !isNumeric
+        ? { where: { nama: { [Op.like]: `%${q}%` } } }
+        : {}),
+    };
+
+    const result = await Barang.findAndCountAll({
+      where: whereCondition,
+      include: [kategoriInclude],
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
     });
+
     res.json({
       success: true,
-      message: "Berhasil mengambil semua kategori",
-      data,
+      message: "Berhasil mengambil data barang",
+      data: result.rows,
+      total: result.count,
+      page,
+      limit,
+      totalPages: Math.ceil(result.count / limit),
     });
   } catch (error) {
     res.status(500).json({

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
 /**
  * @swagger
@@ -79,5 +80,35 @@ router.post("/register", authController.register);
  *         description: Error server
  */
 router.post("/login", authController.login);
+
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Ambil data profil user yang sedang login
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Berhasil mengambil data user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     username:
+ *                       type: string
+ *                     nama:
+ *                       type: string
+ *       401:
+ *         description: Token tidak valid atau tidak ada
+ */
+router.get("/me", authMiddleware, authController.getProfile);
 
 module.exports = router;

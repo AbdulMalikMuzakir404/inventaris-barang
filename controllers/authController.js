@@ -66,7 +66,11 @@ exports.login = [
       }
 
       const token = jwt.sign(
-        { userId: user.id, username: user.username },
+        {
+          id: user.id,
+          username: user.username,
+          nama: user.nama,
+        },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
       );
@@ -93,3 +97,24 @@ exports.login = [
     }
   },
 ];
+
+exports.getProfile = (req, res) => {
+  try {
+    const { id, username, nama } = req.user;
+
+    if (!id || !username) {
+      return res.status(400).json({
+        message: "Data user tidak lengkap dari token",
+      });
+    }
+
+    res.json({
+      user: { id, username, nama },
+    });
+  } catch (error) {
+    console.error("Error di getProfile:", error);
+    return res.status(500).json({
+      message: "Terjadi kesalahan saat mengambil data profil user",
+    });
+  }
+};

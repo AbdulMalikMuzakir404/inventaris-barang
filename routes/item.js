@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const itemController = require("../controllers/itemController");
 const { itemValidation } = require("../validation/itemValidation");
-const authMiddleware = require('../middlewares/authMiddleware');
+const authMiddleware = require("../middlewares/authMiddleware");
 
 router.use(authMiddleware);
 
@@ -17,14 +17,54 @@ router.use(authMiddleware);
  * @swagger
  * /api/item:
  *   get:
- *     summary: Ambil semua data barang
+ *     summary: Ambil semua data barang dengan pencarian dan pagination
  *     tags: [Barang]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Nomor halaman, default 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Jumlah data per halaman, default 10
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         description: Kata kunci pencarian (nama barang, stok, atau nama kategori)
  *     responses:
  *       200:
  *         description: Daftar barang berhasil diambil
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Berhasil mengambil data barang
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Item'
+ *                 total:
+ *                   type: integer
+ *                 page:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 totalPages:
+ *                   type: integer
  */
+
 router.get("/", itemController.getAll);
 
 /**

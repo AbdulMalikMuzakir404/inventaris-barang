@@ -25,6 +25,63 @@ const swaggerOptions = {
       description: "Dokumentasi REST API untuk Inventaris Barang",
     },
     components: {
+      schemas: {
+        Item: {
+          type: "object",
+          properties: {
+            id: { type: "integer", example: 1 },
+            nama: { type: "string", example: "Barang A" },
+            stok: { type: "integer", example: 100 },
+            kategoriId: { type: "integer", example: 2 },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-05-28T05:57:38.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-05-28T05:57:38.000Z",
+            },
+            kategori: {
+              type: "object",
+              properties: {
+                id: { type: "integer", example: 2 },
+                nama: { type: "string", example: "Kategori 1" },
+                kode: { type: "string", example: "KTG01" },
+                createdAt: {
+                  type: "string",
+                  format: "date-time",
+                  example: "2025-05-28T05:38:20.000Z",
+                },
+                updatedAt: {
+                  type: "string",
+                  format: "date-time",
+                  example: "2025-05-28T05:38:20.000Z",
+                },
+              },
+            },
+          },
+        },
+        Category: {
+          type: "object",
+          properties: {
+            id: { type: "integer", example: 1 },
+            kode: { type: "string", example: "Kode A" },
+            nama: { type: "string", example: "Kategori A" },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-05-28T05:38:20.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-05-28T05:57:38.000Z",
+            },
+          },
+        },
+      },
       securitySchemes: {
         bearerAuth: {
           type: "http",

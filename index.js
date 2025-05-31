@@ -115,12 +115,6 @@ app.use("/api/category", categoryRoutes);
 
 // === START SERVER ===
 app.listen(basePort || 3000, () => {
-  console.log(
-    `Server berjalan di ${baseUrl || "localhost"}:${basePort || 3000}`
-  );
-  console.log(
-    `Swagger dokumentasi: ${baseUrl || "localhost"}:${
-      basePort || 3000
-    }/api-docs`
-  );
+  console.log(`Server berjalan di ${baseUrl || "localhost:3000"}`);
+  console.log(`Swagger dokumentasi: ${baseUrl || "localhost:3000"}/api-docs`);
 });

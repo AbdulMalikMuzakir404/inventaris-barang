@@ -1,6 +1,9 @@
 const { Barang, Kategori } = require("../models");
-const handleError = require("../utils/handleError");
 const { Op } = require("sequelize");
+const deleteFile = require("../utils/deleteFile");
+const handleError = require("../utils/handleError");
+
+const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
 exports.getAll = async (req, res) => {
   try {
@@ -48,11 +51,7 @@ exports.getAll = async (req, res) => {
       totalPages: Math.ceil(result.count / limit),
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data",
-      error: error.message,
-    });
+    handleError(res, error, "Gagal mengambil data barang");
   }
 };
 
@@ -67,29 +66,24 @@ exports.getById = async (req, res) => {
     if (data) {
       res.json({
         success: true,
-        message: "Data kategori ditemukan",
+        message: "Data barang ditemukan",
         data,
       });
     } else {
       res.status(404).json({
         success: false,
-        message: "Kategori tidak ditemukan",
+        message: "Barang tidak ditemukan",
       });
     }
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data",
-      error: error.message,
-    });
+    handleError(res, error, "Gagal mengambil detail barang");
   }
 };
 
-const deleteFile = require("../utils/deleteFile");
-
 exports.create = async (req, res) => {
   try {
-    const cover = req.file ? req.file.filename : null;
+    const fileName = req.file ? req.file.filename : null;
+    const cover = fileName ? `${BASE_URL}/uploads/${fileName}` : null;
 
     const data = await Barang.create({
       ...req.body,
@@ -102,15 +96,9 @@ exports.create = async (req, res) => {
       data,
     });
   } catch (error) {
-    if (req.file) {
-      deleteFile(req.file.filename);
-    }
+    if (req.file) deleteFile(req.file.filename);
 
-    res.status(500).json({
-      success: false,
-      message: "Gagal menambahkan barang",
-      error: error.message,
-    });
+    handleError(res, error, "Gagal menambahkan barang");
   }
 };
 
@@ -124,7 +112,16 @@ exports.update = async (req, res) => {
       });
     }
 
-    const cover = req.file ? req.file.filename : data.cover;
+    let cover = data.cover;
+
+    if (req.file) {
+      const newFile = req.file.filename;
+      const oldFile = data.cover?.split("/uploads/")[1];
+
+      if (oldFile) deleteFile(oldFile);
+
+      cover = `${BASE_URL}/uploads/${newFile}`;
+    }
 
     await data.update({
       ...req.body,
@@ -137,11 +134,9 @@ exports.update = async (req, res) => {
       data,
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "Gagal mengupdate barang",
-      error: error.message,
-    });
+    if (req.file) deleteFile(req.file.filename);
+
+    handleError(res, error, "Gagal mengupdate barang");
   }
 };
 
@@ -151,20 +146,19 @@ exports.remove = async (req, res) => {
     if (!data) {
       return res.status(404).json({
         success: false,
-        message: "Kategori tidak ditemukan",
+        message: "Barang tidak ditemukan",
       });
     }
+
+    const fileName = data.cover?.split("/uploads/")[1];
+    if (fileName) deleteFile(fileName);
 
     await data.destroy();
     res.json({
       success: true,
-      message: "Kategori berhasil dihapus",
+      message: "Barang berhasil dihapus",
     });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "Gagal menghapus kategori",
-      error: error.message,
-    });
+    handleError(res, error, "Gagal menghapus barang");
   }
 };

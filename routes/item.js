@@ -3,6 +3,7 @@ const router = express.Router();
 const itemController = require("../controllers/itemController");
 const { itemValidation } = require("../validation/itemValidation");
 const authMiddleware = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/upload");
 
 router.use(authMiddleware);
 
@@ -17,7 +18,8 @@ router.use(authMiddleware);
  * @swagger
  * /api/item:
  *   get:
- *     summary: Ambil semua data barang dengan pencarian dan pagination
+ *     summary: Ambil daftar semua barang
+ *     description: Mengambil data semua barang yang tersedia dengan dukungan pencarian berdasarkan nama barang, jumlah stok, atau nama kategori. Juga mendukung pagination.
  *     tags: [Barang]
  *     security:
  *       - bearerAuth: []
@@ -36,7 +38,7 @@ router.use(authMiddleware);
  *         name: q
  *         schema:
  *           type: string
- *         description: Kata kunci pencarian (nama barang, stok, atau nama kategori)
+ *         description: Kata kunci pencarian (nama barang, jumlah stok, atau nama kategori)
  *     responses:
  *       200:
  *         description: Daftar barang berhasil diambil
@@ -57,21 +59,25 @@ router.use(authMiddleware);
  *                     $ref: '#/components/schemas/Item'
  *                 total:
  *                   type: integer
+ *                   example: 25
  *                 page:
  *                   type: integer
+ *                   example: 1
  *                 limit:
  *                   type: integer
+ *                   example: 10
  *                 totalPages:
  *                   type: integer
+ *                   example: 3
  */
-
 router.get("/", itemController.getAll);
 
 /**
  * @swagger
  * /api/item/{id}:
  *   get:
- *     summary: Ambil data barang berdasarkan ID
+ *     summary: Ambil detail data barang berdasarkan ID
+ *     description: Mengambil data lengkap dari satu barang berdasarkan ID, termasuk informasi kategori dan URL gambar cover.
  *     tags: [Barang]
  *     security:
  *       - bearerAuth: []
@@ -81,12 +87,36 @@ router.get("/", itemController.getAll);
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID barang
+ *         description: ID barang yang ingin diambil
  *     responses:
  *       200:
- *         description: Data barang ditemukan
+ *         description: Data barang berhasil ditemukan
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Data barang ditemukan
+ *                 data:
+ *                   $ref: '#/components/schemas/Item'
  *       404:
  *         description: Barang tidak ditemukan
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Barang tidak ditemukan
  */
 router.get("/:id", itemController.getById);
 
@@ -101,7 +131,7 @@ router.get("/:id", itemController.getById);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -111,11 +141,14 @@ router.get("/:id", itemController.getById);
  *                 type: integer
  *               kategoriId:
  *                 type: integer
+ *               cover:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       201:
  *         description: Barang berhasil ditambahkan
  */
-router.post("/", itemValidation, itemController.create);
+router.post("/", upload.single("cover"), itemValidation, itemController.create);
 
 /**
  * @swagger
@@ -134,7 +167,7 @@ router.post("/", itemValidation, itemController.create);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -144,13 +177,21 @@ router.post("/", itemValidation, itemController.create);
  *                 type: integer
  *               kategoriId:
  *                 type: integer
+ *               cover:
+ *                 type: string
+ *                 format: binary
  *     responses:
  *       200:
  *         description: Barang berhasil diupdate
  *       404:
  *         description: Barang tidak ditemukan
  */
-router.put("/:id", itemValidation, itemController.update);
+router.put(
+  "/:id",
+  upload.single("cover"),
+  itemValidation,
+  itemController.update
+);
 
 /**
  * @swagger

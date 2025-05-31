@@ -85,16 +85,32 @@ exports.getById = async (req, res) => {
   }
 };
 
+const deleteFile = require("../utils/deleteFile");
+
 exports.create = async (req, res) => {
   try {
-    const data = await Barang.create(req.body);
+    const cover = req.file ? req.file.filename : null;
+
+    const data = await Barang.create({
+      ...req.body,
+      cover,
+    });
+
     res.status(201).json({
       success: true,
-      message: "Kategori berhasil ditambahkan",
+      message: "Barang berhasil ditambahkan",
       data,
     });
   } catch (error) {
-    handleError(res, error, "Gagal menambahkan kategori");
+    if (req.file) {
+      deleteFile(req.file.filename);
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Gagal menambahkan barang",
+      error: error.message,
+    });
   }
 };
 
@@ -104,20 +120,26 @@ exports.update = async (req, res) => {
     if (!data) {
       return res.status(404).json({
         success: false,
-        message: "Kategori tidak ditemukan",
+        message: "Barang tidak ditemukan",
       });
     }
 
-    await data.update(req.body);
+    const cover = req.file ? req.file.filename : data.cover;
+
+    await data.update({
+      ...req.body,
+      cover,
+    });
+
     res.json({
       success: true,
-      message: "Kategori berhasil diupdate",
+      message: "Barang berhasil diupdate",
       data,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: "Gagal mengupdate kategori",
+      message: "Gagal mengupdate barang",
       error: error.message,
     });
   }

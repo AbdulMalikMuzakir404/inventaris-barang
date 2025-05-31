@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       stok: DataTypes.INTEGER,
+      cover: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       sequelize,

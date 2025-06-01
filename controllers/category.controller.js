@@ -1,6 +1,5 @@
-const { Kategori, Barang } = require("../models");
+const categoryService = require("../services/category.service");
 const handleError = require("../utils/handleError");
-const { Op } = require("sequelize");
 
 exports.getAll = async (req, res) => {
   try {
@@ -9,23 +8,7 @@ exports.getAll = async (req, res) => {
     const offset = (page - 1) * limit;
     const q = req.query.q?.trim();
 
-    const isSearch = !!q;
-
-    const whereCondition = isSearch
-      ? {
-          [Op.or]: [
-            { nama: { [Op.like]: `%${q}%` } },
-            { kode: { [Op.like]: `%${q}%` } },
-          ],
-        }
-      : {};
-
-    const result = await Kategori.findAndCountAll({
-      where: whereCondition,
-      limit,
-      offset,
-      order: [["createdAt", "DESC"]],
-    });
+    const result = await categoryService.findAll(q, limit, offset);
 
     res.json({
       success: true,
@@ -37,62 +20,46 @@ exports.getAll = async (req, res) => {
       totalPages: Math.ceil(result.count / limit),
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data",
-      error: error.message,
-    });
+    handleError(res, error, "Gagal mengambil data kategori");
   }
 };
 
 exports.getAllSimple = async (req, res) => {
   try {
-    const data = await Kategori.findAll({
-      order: [["nama", "ASC"]],
-      attributes: ["id", "kode", "nama"],
-    });
-
+    const data = await categoryService.findAllSimple();
     res.json({
       success: true,
       message: "Berhasil mengambil semua kategori (simple)",
       data,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data kategori",
-      error: error.message,
-    });
+    handleError(res, error, "Gagal mengambil data kategori");
   }
 };
 
 exports.getById = async (req, res) => {
   try {
-    const data = await Kategori.findByPk(req.params.id);
-    if (data) {
-      res.json({
-        success: true,
-        message: "Data kategori ditemukan",
-        data,
-      });
-    } else {
-      res.status(404).json({
+    const data = await categoryService.findById(req.params.id);
+    if (!data) {
+      return res.status(404).json({
         success: false,
         message: "Kategori tidak ditemukan",
       });
     }
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Gagal mengambil data",
-      error: error.message,
+
+    res.json({
+      success: true,
+      message: "Data kategori ditemukan",
+      data,
     });
+  } catch (error) {
+    handleError(res, error, "Gagal mengambil data kategori");
   }
 };
 
 exports.create = async (req, res) => {
   try {
-    const data = await Kategori.create(req.body);
+    const data = await categoryService.create(req.body);
     res.status(201).json({
       success: true,
       message: "Kategori berhasil ditambahkan",
@@ -105,34 +72,7 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const data = await Kategori.findByPk(req.params.id);
-    if (!data) {
-      return res.status(404).json({
-        success: false,
-        message: "Kategori tidak ditemukan",
-      });
-    }
-
-    await data.update(req.body);
-    res.json({
-      success: true,
-      message: "Kategori berhasil diupdate",
-      data,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "Gagal mengupdate kategori",
-      error: error.message,
-    });
-  }
-};
-
-exports.remove = async (req, res) => {
-  try {
-    const id = req.params.id;
-
-    const kategori = await Kategori.findByPk(id);
+    const kategori = await categoryService.findById(req.params.id);
     if (!kategori) {
       return res.status(404).json({
         success: false,
@@ -140,8 +80,30 @@ exports.remove = async (req, res) => {
       });
     }
 
-    const relatedItems = await Barang.findOne({ where: { kategoriId: id } });
-    if (relatedItems) {
+    await categoryService.update(kategori, req.body);
+
+    res.json({
+      success: true,
+      message: "Kategori berhasil diupdate",
+      data: kategori,
+    });
+  } catch (error) {
+    handleError(res, error, "Gagal mengupdate kategori");
+  }
+};
+
+exports.remove = async (req, res) => {
+  try {
+    const kategori = await categoryService.findById(req.params.id);
+    if (!kategori) {
+      return res.status(404).json({
+        success: false,
+        message: "Kategori tidak ditemukan",
+      });
+    }
+
+    const related = await categoryService.hasRelatedItems(kategori.id);
+    if (related) {
       return res.status(400).json({
         success: false,
         message:
@@ -149,17 +111,13 @@ exports.remove = async (req, res) => {
       });
     }
 
-    await kategori.destroy();
+    await categoryService.remove(kategori);
 
     res.json({
       success: true,
       message: "Kategori berhasil dihapus",
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan saat menghapus kategori",
-      error: error.message,
-    });
+    handleError(res, error, "Terjadi kesalahan saat menghapus kategori");
   }
 };

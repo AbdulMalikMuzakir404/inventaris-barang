@@ -1,5 +1,4 @@
-const { Barang, Kategori } = require("../models");
-const { Op } = require("sequelize");
+const itemService = require("../services/item.service");
 const deleteFile = require("../utils/deleteFile");
 const handleError = require("../utils/handleError");
 
@@ -12,34 +11,7 @@ exports.getAll = async (req, res) => {
     const offset = (page - 1) * limit;
     const q = req.query.q?.trim();
 
-    const isSearch = !!q;
-    const isNumeric = !isNaN(q);
-
-    const whereCondition = isSearch
-      ? {
-          [Op.or]: [
-            { nama: { [Op.like]: `%${q}%` } },
-            ...(isNumeric ? [{ stok: parseInt(q) }] : []),
-          ],
-        }
-      : {};
-
-    const kategoriInclude = {
-      model: Kategori,
-      as: "kategori",
-      required: false,
-      ...(isSearch && !isNumeric
-        ? { where: { nama: { [Op.like]: `%${q}%` } } }
-        : {}),
-    };
-
-    const result = await Barang.findAndCountAll({
-      where: whereCondition,
-      include: [kategoriInclude],
-      limit,
-      offset,
-      order: [["createdAt", "DESC"]],
-    });
+    const result = await itemService.findAll(q, limit, offset);
 
     res.json({
       success: true,
@@ -57,24 +29,19 @@ exports.getAll = async (req, res) => {
 
 exports.getById = async (req, res) => {
   try {
-    const data = await Barang.findByPk(req.params.id, {
-      include: {
-        model: Kategori,
-        as: "kategori",
-      },
-    });
-    if (data) {
-      res.json({
-        success: true,
-        message: "Data barang ditemukan",
-        data,
-      });
-    } else {
-      res.status(404).json({
+    const data = await itemService.findById(req.params.id);
+    if (!data) {
+      return res.status(404).json({
         success: false,
         message: "Barang tidak ditemukan",
       });
     }
+
+    res.json({
+      success: true,
+      message: "Data barang ditemukan",
+      data,
+    });
   } catch (error) {
     handleError(res, error, "Gagal mengambil detail barang");
   }
@@ -85,7 +52,7 @@ exports.create = async (req, res) => {
     const fileName = req.file ? req.file.filename : null;
     const cover = fileName ? `${BASE_URL}/uploads/${fileName}` : null;
 
-    const data = await Barang.create({
+    const data = await itemService.create({
       ...req.body,
       cover,
     });
@@ -97,33 +64,30 @@ exports.create = async (req, res) => {
     });
   } catch (error) {
     if (req.file) deleteFile(req.file.filename);
-
     handleError(res, error, "Gagal menambahkan barang");
   }
 };
 
 exports.update = async (req, res) => {
   try {
-    const data = await Barang.findByPk(req.params.id);
-    if (!data) {
+    const item = await itemService.findById(req.params.id);
+    if (!item) {
       return res.status(404).json({
         success: false,
         message: "Barang tidak ditemukan",
       });
     }
 
-    let cover = data.cover;
+    let cover = item.cover;
 
     if (req.file) {
       const newFile = req.file.filename;
-      const oldFile = data.cover?.split("/uploads/")[1];
-
+      const oldFile = item.cover?.split("/uploads/")[1];
       if (oldFile) deleteFile(oldFile);
-
       cover = `${BASE_URL}/uploads/${newFile}`;
     }
 
-    await data.update({
+    await itemService.update(item, {
       ...req.body,
       cover,
     });
@@ -131,29 +95,29 @@ exports.update = async (req, res) => {
     res.json({
       success: true,
       message: "Barang berhasil diupdate",
-      data,
+      data: item,
     });
   } catch (error) {
     if (req.file) deleteFile(req.file.filename);
-
     handleError(res, error, "Gagal mengupdate barang");
   }
 };
 
 exports.remove = async (req, res) => {
   try {
-    const data = await Barang.findByPk(req.params.id);
-    if (!data) {
+    const item = await itemService.findById(req.params.id);
+    if (!item) {
       return res.status(404).json({
         success: false,
         message: "Barang tidak ditemukan",
       });
     }
 
-    const fileName = data.cover?.split("/uploads/")[1];
+    const fileName = item.cover?.split("/uploads/")[1];
     if (fileName) deleteFile(fileName);
 
-    await data.destroy();
+    await itemService.remove(item);
+
     res.json({
       success: true,
       message: "Barang berhasil dihapus",

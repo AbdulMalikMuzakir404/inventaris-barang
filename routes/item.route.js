@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const itemController = require("../controllers/itemController");
-const { itemValidation } = require("../validation/itemValidation");
-const authMiddleware = require("../middlewares/authMiddleware");
-const upload = require("../middlewares/upload");
+const itemController = require("../controllers/item.controller");
+const { itemValidation } = require("../validation/item.validation");
+const authMiddleware = require("../middlewares/auth.middleware");
+const upload = require("../middlewares/upload.middleware");
 
 router.use(authMiddleware);
 

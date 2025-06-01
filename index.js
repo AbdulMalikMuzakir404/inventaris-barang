@@ -93,9 +93,9 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // === ROUTES ===
-app.use("/api/auth", require("./routes/auth"));
-app.use("/api/item", require("./routes/item"));
-app.use("/api/category", require("./routes/category"));
+app.use("/api/auth", require("./routes/auth.route"));
+app.use("/api/item", require("./routes/item.route"));
+app.use("/api/category", require("./routes/category.route"));
 
 // === Error Handling Middleware ===
 app.use((err, req, res, next) => {

@@ -2,19 +2,25 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
+const {
+  loginValidation,
+  registerValidation,
+  updateProfileValidation,
+  changePasswordValidation,
+} = require("../validation/auth.validation");
 
 /**
  * @swagger
  * tags:
  *   name: Auth
- *   description: Autentikasi user
+ *   description: Manajemen autentikasi dan profil pengguna
  */
 
 /**
  * @swagger
  * /api/auth/register:
  *   post:
- *     summary: Registrasi user baru
+ *     summary: Registrasi pengguna baru
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -31,29 +37,34 @@ const authMiddleware = require("../middlewares/auth.middleware");
  *             properties:
  *               nama:
  *                 type: string
+ *                 example: John Doe
  *               username:
  *                 type: string
+ *                 example: johndoe
  *               email:
  *                 type: string
+ *                 example: johndoe@example.com
  *               password:
  *                 type: string
+ *                 example: secret123
  *               confirmPassword:
  *                 type: string
+ *                 example: secret123
  *     responses:
  *       201:
  *         description: Registrasi berhasil
  *       400:
- *         description: Gagal validasi atau username sudah dipakai
+ *         description: Validasi gagal atau email/username sudah digunakan
  *       500:
- *         description: Error server
+ *         description: Terjadi kesalahan server
  */
-router.post("/register", authController.register);
+router.post("/register", registerValidation, authController.register);
 
 /**
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Login user
+ *     summary: Login pengguna
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -67,31 +78,31 @@ router.post("/register", authController.register);
  *             properties:
  *               username:
  *                 type: string
+ *                 example: johndoe
  *               password:
  *                 type: string
+ *                 example: secret123
  *     responses:
  *       200:
- *         description: Login berhasil dan token dikembalikan
+ *         description: Login berhasil, token dikembalikan
  *       401:
- *         description: Password salah
- *       404:
- *         description: User tidak ditemukan
+ *         description: Username atau password salah
  *       500:
- *         description: Error server
+ *         description: Terjadi kesalahan server
  */
-router.post("/login", authController.login);
+router.post("/login", loginValidation, authController.login);
 
 /**
  * @swagger
  * /api/auth/me:
  *   get:
- *     summary: Ambil data profil user yang sedang login
+ *     summary: Mendapatkan data profil pengguna yang sedang login
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Berhasil mengambil data user
+ *         description: Data pengguna berhasil diambil
  *         content:
  *           application/json:
  *             schema:
@@ -107,8 +118,97 @@ router.post("/login", authController.login);
  *                     nama:
  *                       type: string
  *       401:
- *         description: Token tidak valid atau tidak ada
+ *         description: Token tidak valid atau tidak ditemukan
  */
 router.get("/me", authMiddleware, authController.getProfile);
+
+/**
+ * @swagger
+ * /api/auth/update-profile:
+ *   put:
+ *     summary: Memperbarui informasi profil pengguna
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - nama
+ *               - username
+ *               - email
+ *             properties:
+ *               nama:
+ *                 type: string
+ *                 example: John Doe
+ *               username:
+ *                 type: string
+ *                 example: johndoe
+ *               email:
+ *                 type: string
+ *                 example: johndoe@example.com
+ *     responses:
+ *       200:
+ *         description: Profil berhasil diperbarui
+ *       400:
+ *         description: Validasi gagal atau input tidak valid
+ *       401:
+ *         description: Token tidak valid
+ */
+router.put(
+  "/update-profile",
+  authMiddleware,
+  updateProfileValidation,
+  authController.updateProfile
+);
+
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   put:
+ *     summary: Mengubah password pengguna
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *               - confirmPassword
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 example: oldpassword123
+ *                 description: Password lama pengguna
+ *               newPassword:
+ *                 type: string
+ *                 example: newpassword456
+ *                 description: Password baru yang diinginkan
+ *               confirmPassword:
+ *                 type: string
+ *                 example: newpassword456
+ *                 description: Harus sama dengan `newPassword`
+ *     responses:
+ *       200:
+ *         description: Password berhasil diubah
+ *       400:
+ *         description: Validasi gagal atau password lama salah
+ *       401:
+ *         description: Token tidak valid atau tidak ditemukan
+ */
+router.put(
+  "/change-password",
+  authMiddleware,
+  changePasswordValidation,
+  authController.changePassword
+);
 
 module.exports = router;

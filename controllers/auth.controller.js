@@ -78,9 +78,9 @@ exports.login = [
   },
 ];
 
-exports.getProfile = (req, res) => {
+exports.me = (req, res) => {
   try {
-    const { id, username, nama } = req.user;
+    const { id, username, nama, email } = req.user;
 
     if (!id || !username) {
       return res.status(400).json({
@@ -91,7 +91,36 @@ exports.getProfile = (req, res) => {
     res.json({
       success: true,
       message: "Profil user berhasil diambil",
-      data: { id, username, nama },
+      data: { id, username, nama, email },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Terjadi kesalahan saat mengambil data profil user",
+      error: error.message,
+    });
+  }
+};
+
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await authService.findUserById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User tidak ditemukan",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Profil user berhasil diambil",
+      data: {
+        id: user.id,
+        nama: user.nama,
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     return res.status(500).json({

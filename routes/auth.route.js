@@ -117,10 +117,54 @@ router.post("/login", loginValidation, authController.login);
  *                       type: string
  *                     nama:
  *                       type: string
+ *                     email:
+ *                       type: string
  *       401:
  *         description: Token tidak valid atau tidak ditemukan
  */
-router.get("/me", authMiddleware, authController.getProfile);
+router.get("/me", authMiddleware, authController.me);
+
+/**
+ * @swagger
+ * /api/auth/get-profile:
+ *   get:
+ *     summary: Mendapatkan data profil pengguna (versi DB)
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Data pengguna berhasil diambil
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Profil user berhasil diambil
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     username:
+ *                       type: string
+ *                       example: johndoe
+ *                     nama:
+ *                       type: string
+ *                       example: John Doe
+ *                     email:
+ *                       type: string
+ *                       example: johndoe@example.com
+ *       401:
+ *         description: Token tidak valid atau tidak ditemukan
+ */
+router.get("/get-profile", authMiddleware, authController.getProfile);
 
 /**
  * @swagger

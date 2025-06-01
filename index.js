@@ -25,9 +25,17 @@ if (!fs.existsSync(uploadPath)) {
   console.log("📂 Folder 'public/uploads/' dibuat otomatis.");
 }
 
-// === Serve Folder Upload secara Publik ===
-// Sehingga Vue bisa akses: http://localhost:3000/uploads/namafile.jpg
+// === Buat Folder Export jika belum ada ===
+const exportPath = path.join(__dirname, "public/exports");
+if (!fs.existsSync(exportPath)) {
+  fs.mkdirSync(exportPath, { recursive: true });
+  console.log("📂 Folder 'public/exports/' dibuat otomatis.");
+}
+
+// === Serve folder statis ===
 app.use("/uploads", express.static(uploadPath));
+app.use("/exports", express.static(exportPath));
+
 
 // === Swagger Setup ===
 const swaggerOptions = {

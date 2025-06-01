@@ -1,6 +1,7 @@
 const itemService = require("../services/item.service");
 const deleteFile = require("../utils/deleteFile");
 const handleError = require("../utils/handleError");
+const { exportQueue, importQueue } = require("../queues/queue");
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
@@ -124,5 +125,50 @@ exports.remove = async (req, res) => {
     });
   } catch (error) {
     handleError(res, error, "Gagal menghapus barang");
+  }
+};
+
+exports.queueExport = async (req, res) => {
+  try {
+    const job = await exportQueue.add("export", { filters: req.query });
+    res
+      .status(200)
+      .json({ success: true, message: "Job ekspor dimasukkan", jobId: job.id });
+  } catch (err) {
+    handleError(res, err, "Gagal membuat job ekspor");
+  }
+};
+
+exports.queueImport = async (req, res) => {
+  try {
+    if (!req.file)
+      return res
+        .status(400)
+        .json({ success: false, message: "File Excel wajib diunggah" });
+    const job = await importQueue.add("import", {
+      filename: req.file.filename,
+    });
+    res
+      .status(200)
+      .json({ success: true, message: "Job impor dimasukkan", jobId: job.id });
+  } catch (err) {
+    handleError(res, err, "Gagal membuat job impor");
+  }
+};
+
+exports.checkExportStatus = async (req, res) => {
+  try {
+    const job = await exportQueue.getJob(req.params.jobId);
+    if (!job)
+      return res
+        .status(404)
+        .json({ success: false, message: "Job tidak ditemukan" });
+    const [state, result] = await Promise.all([
+      job.getState(),
+      job.finished().catch(() => null),
+    ]);
+    res.json({ success: true, state, result });
+  } catch (err) {
+    handleError(res, err, "Gagal ambil status job");
   }
 };

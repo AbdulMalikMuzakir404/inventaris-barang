@@ -78,10 +78,10 @@ router.post("/register", registerValidation, authController.register);
  *             properties:
  *               username:
  *                 type: string
- *                 example: johndoe
+ *                 example: azka123
  *               password:
  *                 type: string
- *                 example: secret123
+ *                 example: azka123
  *     responses:
  *       200:
  *         description: Login berhasil, token dikembalikan

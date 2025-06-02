@@ -102,6 +102,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // === ROUTES ===
 app.use("/api/auth", require("./routes/auth.route"));
+app.use("/api/item-ei", require("./routes/item.ei.route"));
 app.use("/api/item", require("./routes/item.route"));
 app.use("/api/category", require("./routes/category.route"));
 

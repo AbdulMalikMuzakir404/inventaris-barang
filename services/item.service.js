@@ -1,5 +1,5 @@
 const { Barang, Kategori } = require("../models");
-const { Op } = require("sequelize");
+const { Op, literal } = require("sequelize");
 const ExcelJS = require("exceljs");
 const fs = require("fs");
 
@@ -7,22 +7,33 @@ exports.findAll = async (q, limit, offset) => {
   const isSearch = !!q;
   const isNumeric = !isNaN(q);
 
-  const whereCondition = isSearch
-    ? {
-        [Op.or]: [
-          { nama: { [Op.like]: `%${q}%` } },
-          ...(isNumeric ? [{ stok: parseInt(q) }] : []),
-        ],
-      }
-    : {};
+  let whereCondition = {};
+  if (isSearch) {
+    const orConditions = [
+      { nama: { [Op.like]: `%${q}%` } },
+    ];
+
+    if (isNumeric) {
+      orConditions.push({ stok: parseInt(q) });
+    }
+
+    orConditions.push(
+      literal(`EXISTS (
+        SELECT 1 FROM Kategoris AS kategori
+        WHERE kategori.id = Barang.kategoriId
+        AND kategori.nama LIKE '%${q}%'
+      )`)
+    );
+
+    whereCondition = {
+      [Op.or]: orConditions,
+    };
+  }
 
   const kategoriInclude = {
     model: Kategori,
     as: "kategori",
     required: false,
-    ...(isSearch && !isNumeric
-      ? { where: { nama: { [Op.like]: `%${q}%` } } }
-      : {}),
   };
 
   return await Barang.findAndCountAll({

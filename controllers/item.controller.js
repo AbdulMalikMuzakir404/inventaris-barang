@@ -159,15 +159,24 @@ exports.queueImport = async (req, res) => {
 exports.checkExportStatus = async (req, res) => {
   try {
     const job = await exportQueue.getJob(req.params.jobId);
-    if (!job)
-      return res
-        .status(404)
-        .json({ success: false, message: "Job tidak ditemukan" });
+
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        message: "Job tidak ditemukan",
+      });
+    }
+
     const [state, result] = await Promise.all([
       job.getState(),
       job.finished().catch(() => null),
     ]);
-    res.json({ success: true, state, result });
+
+    res.json({
+      success: true,
+      state,
+      data: result,
+    });
   } catch (err) {
     handleError(res, err, "Gagal ambil status job");
   }
